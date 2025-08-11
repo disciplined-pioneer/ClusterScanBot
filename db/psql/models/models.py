@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import TypeVar, Generic, Sequence
 
 from sqlalchemy.exc import NoResultFound
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.future import select as sqlalchemy_select
 from sqlalchemy.orm import Mapped, selectinload, load_only
 from sqlalchemy.sql import select, update as sqlalchemy_update
@@ -208,7 +209,7 @@ class ModelAdmin(Generic[T]):
             return result.scalars().all()
 
 
-# Хранение списка актуальных подписок
+# Хранение всех пользователей
 class Users(Base, ModelAdmin):
     
     __tablename__ = 'users'
@@ -221,3 +222,12 @@ class Users(Base, ModelAdmin):
         comment='Роль пользователя'
     )
     date_registration: Mapped[datetime] = mapped_column(default=now_moscow)
+
+
+# Актуальный список фьючерсов для анализа
+class Futures(Base, ModelAdmin):
+    
+    __tablename__ = 'futures'
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    futures: Mapped[list] = mapped_column(JSONB, nullable=False, default=list)

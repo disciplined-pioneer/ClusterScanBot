@@ -31,6 +31,8 @@ async def new_user_start(message: Message, state: FSMContext):
             )
         except Exception:
             pass
+
+        return
     else:
         await message.delete()
     
@@ -40,7 +42,8 @@ async def new_user_start(message: Message, state: FSMContext):
     await Users.create(tg_id=tg_id, username=username)
     
     await message.answer(
-        text=t.start_user_msg
+        text=t.start_user_msg,
+        reply_markup=await t.get_objects_keyboard()
     )
 
 
@@ -64,11 +67,14 @@ async def start_command(message: Message, state: FSMContext):
             )
         except Exception:
             pass
+
+        return
     else:
         await message.delete()
     
     await message.answer(
-        text=t.start_user_msg
+        text=t.start_user_msg,
+        reply_markup=await t.get_objects_keyboard()
     )
 
 
@@ -77,5 +83,6 @@ async def start_command(message: Message, state: FSMContext):
 async def go_menu_user(callback: types.CallbackQuery, state: FSMContext):
 
     await callback.message.edit_text(
-        text=t.start_user_msg
+        text=t.start_user_msg,
+        reply_markup=await t.get_objects_keyboard()
     )
