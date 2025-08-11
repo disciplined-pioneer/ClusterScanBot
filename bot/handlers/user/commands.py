@@ -45,6 +45,7 @@ async def new_user_start(message: Message, state: FSMContext):
         text=t.start_user_msg,
         reply_markup=await t.get_objects_keyboard()
     )
+    await state.clear()
 
 
 # Старый пользователь
@@ -77,6 +78,8 @@ async def start_command(message: Message, state: FSMContext):
         reply_markup=await t.get_objects_keyboard()
     )
 
+    await state.clear()
+
 
 # Обработка кнопки "Меню"
 @router.callback_query(F.data == "go_menu_user")
@@ -86,3 +89,4 @@ async def go_menu_user(callback: types.CallbackQuery, state: FSMContext):
         text=t.start_user_msg,
         reply_markup=await t.get_objects_keyboard()
     )
+    await state.clear()
