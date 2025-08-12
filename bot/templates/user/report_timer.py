@@ -17,7 +17,7 @@ def format_futures_update(old_list: list, new_list: list) -> str:
     added_count = len(added_futures)
 
     # Процент отобранных к исходным
-    percent = (new_count / old_count * 100) if old_count > 0 else 0
+    percent = new_count / 402 * 100
 
     # Формируем списки для вывода
     old_str = ', '.join(old_list) if old_list else '—'
