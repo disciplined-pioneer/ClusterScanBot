@@ -43,7 +43,7 @@ async def get_objects_keyboard(page: int = 0, OBJECTS_PER_PAGE: int = 9):
 
     return InlineKeyboardMarkup(inline_keyboard=buttons)
 
-def get_timeframes_keyboard(selected_timeframes: list[str] = None) -> InlineKeyboardMarkup:
+def get_timeframes_keyboard(selected_timeframes: list[str] = None, callback_back: str='list_futures') -> InlineKeyboardMarkup:
 
     if selected_timeframes is None:
         selected_timeframes = []
@@ -61,6 +61,6 @@ def get_timeframes_keyboard(selected_timeframes: list[str] = None) -> InlineKeyb
     buttons.append(action_buttons)
 
     # Кнопка меню отдельным рядом
-    buttons.append([InlineKeyboardButton(text="◀️ Назад", callback_data="list_futures")])
+    buttons.append([InlineKeyboardButton(text="◀️ Назад", callback_data=callback_back)])
 
     return InlineKeyboardMarkup(inline_keyboard=buttons)

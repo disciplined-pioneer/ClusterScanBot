@@ -63,7 +63,7 @@ async def received_futures_name(message: Message, state: FSMContext):
         chat_id=message.from_user.id,
         message_id=last_id_msg,
         text=t.format_timeframes_message(futures_name),
-        reply_markup=k.get_timeframes_keyboard()
+        reply_markup=k.get_timeframes_keyboard(callback_back='enter_futures')
     )
 
     await state.update_data(futures_name=futures_name)
@@ -119,7 +119,7 @@ async def time_frame_choice(callback: types.CallbackQuery, state: FSMContext):
     )
 
 
-# Обработка всех таймфреймов
+# Обработка выбора всех таймфреймов
 @router.callback_query(F.data == "select_all")
 async def select_all_futures(callback: types.CallbackQuery, state: FSMContext):
 
