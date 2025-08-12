@@ -4,6 +4,6 @@ from bot.handlers.user.futures_selection import router as futures_selection
 
 routers = [
     start,
+    futures_selection,
     auxiliary,
-    futures_selection
 ]

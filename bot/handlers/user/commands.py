@@ -6,6 +6,7 @@ from aiogram.fsm.context import FSMContext
 from core.bot import bot
 from settings import settings
 
+import bot.keyboards.user.commands as k
 import bot.templates.user.commands as t
 
 from bot.filters.user import NewUser
@@ -40,10 +41,10 @@ async def new_user_start(message: Message, state: FSMContext):
     tg_id = message.from_user.id
     username = message.from_user.username
     await Users.create(tg_id=tg_id, username=username)
-    
+
     await message.answer(
         text=t.start_user_msg,
-        reply_markup=await t.get_objects_keyboard()
+        reply_markup=k.futures_menu
     )
     await state.clear()
 
@@ -52,7 +53,7 @@ async def new_user_start(message: Message, state: FSMContext):
 @router.message(Command("start"))
 async def start_command(message: Message, state: FSMContext):
     """
-        /start command
+    /start command
     :param msg: Message
     :param state: FSMContext
     :return:
@@ -75,7 +76,7 @@ async def start_command(message: Message, state: FSMContext):
     
     await message.answer(
         text=t.start_user_msg,
-        reply_markup=await t.get_objects_keyboard()
+        reply_markup=k.futures_menu
     )
 
     await state.clear()
@@ -87,6 +88,6 @@ async def go_menu_user(callback: types.CallbackQuery, state: FSMContext):
 
     await callback.message.edit_text(
         text=t.start_user_msg,
-        reply_markup=await t.get_objects_keyboard()
+        reply_markup=k.futures_menu
     )
     await state.clear()
