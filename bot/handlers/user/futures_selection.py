@@ -59,11 +59,27 @@ async def received_futures_name(message: Message, state: FSMContext):
     except:
         return
     
+    await state.set_state(None)
     await bot.edit_message_text(
         chat_id=message.from_user.id,
         message_id=last_id_msg,
         text=t.format_timeframes_message(futures_name),
         reply_markup=k.get_timeframes_keyboard(callback_back='enter_futures')
+    )
+
+    await state.update_data(futures_name=futures_name)
+
+
+# Обработка выбранного фьючерса
+@router.callback_query(F.data.startswith("futures:"))
+async def futures_choice(callback: types.CallbackQuery, state: FSMContext):
+
+    await state.set_state(None)
+    futures_name = callback.data.split(':')[1]
+
+    await callback.message.edit_text(
+        text=t.format_timeframes_message(futures_name),
+        reply_markup=k.get_timeframes_keyboard()
     )
 
     await state.update_data(futures_name=futures_name)
@@ -77,20 +93,6 @@ async def pagination_handler(callback: types.CallbackQuery):
 
     await callback.message.edit_reply_markup(reply_markup=markup) 
     await callback.answer() 
-
-
-# Обработка выбранного фьючерса
-@router.callback_query(F.data.startswith("futures:"))
-async def futures_choice(callback: types.CallbackQuery, state: FSMContext):
-
-    futures_name = callback.data.split(':')[1]
-
-    await callback.message.edit_text(
-        text=t.format_timeframes_message(futures_name),
-        reply_markup=k.get_timeframes_keyboard()
-    )
-
-    await state.update_data(futures_name=futures_name)
 
 
 # Обработка выбранного таймфрейма
