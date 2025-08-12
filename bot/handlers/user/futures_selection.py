@@ -43,7 +43,21 @@ async def received_futures_name(message: Message, state: FSMContext):
     await message.delete()
     data = await state.get_data()
     last_id_msg = data.get('last_id_msg')
-    futures_name = message.text
+
+    # Проверка фьючерса на корректность
+    futures_name, error_text = u.check_futures_presence(message.text)
+    try:
+        if error_text:
+            await bot.edit_message_text(
+                chat_id=message.from_user.id,
+                message_id=last_id_msg,
+                text=error_text,
+                reply_markup=k.go_menu_user
+            )
+            await state.set_state(u.FuturesStates.futures_name)
+            return
+    except:
+        return
     
     await bot.edit_message_text(
         chat_id=message.from_user.id,
