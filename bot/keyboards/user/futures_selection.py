@@ -1,3 +1,4 @@
+import math
 from db.psql.models.models import Futures
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
@@ -11,13 +12,15 @@ go_menu_user = InlineKeyboardMarkup(
 
 async def get_objects_keyboard(page: int = 0, OBJECTS_PER_PAGE: int = 9):
 
-    """Меню с пагинацией — выбор фьючерса"""
+    """Меню с пагинацией — выбора фьючерса"""
 
     objects = await Futures.get(id=1)
     if not objects or not objects.futures:
         return InlineKeyboardMarkup(inline_keyboard=[])
 
     list_futures = objects.futures
+    total_items = len(list_futures)
+    total_pages = math.ceil(total_items / OBJECTS_PER_PAGE)
 
     start = page * OBJECTS_PER_PAGE
     end = start + OBJECTS_PER_PAGE
@@ -31,13 +34,30 @@ async def get_objects_keyboard(page: int = 0, OBJECTS_PER_PAGE: int = 9):
     ]
 
     nav_buttons = []
-    if page > 0:
+    has_prev = page > 0
+    has_next = end < len(list_futures)
+
+    # Кнопка Назад
+    if has_prev:
         nav_buttons.append(InlineKeyboardButton(text="⬅ Назад", callback_data=f"page:{page - 1}"))
-    if end < len(list_futures):
+
+    # Кнопка Вперёд
+    if has_next:
         nav_buttons.append(InlineKeyboardButton(text="Вперёд ➡", callback_data=f"page:{page + 1}"))
 
-    if nav_buttons:
-        buttons.append(nav_buttons)  # навигация — одна строка
+    page_button = InlineKeyboardButton(text=f"{page+1}/{total_pages}", callback_data="noop")
+
+    if has_prev and has_next:
+        # Обе кнопки есть — номер посередине
+        buttons.append([
+            nav_buttons[0],
+            page_button,
+            nav_buttons[1]
+        ])
+    elif has_prev or has_next:
+        # Только одна кнопка — номер страницы над кнопкой
+        buttons.append([page_button])
+        buttons.append(nav_buttons)
 
     buttons.append([InlineKeyboardButton(text="🔙 Меню", callback_data="go_menu_user")])
 
