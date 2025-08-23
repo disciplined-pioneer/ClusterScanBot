@@ -125,6 +125,9 @@ class AsyncCryptoDataFetcher:
         """
         results = {}
         endpoint = "/fapi/v1/klines"
+        self.prepare_folders(time_frames)
+
+        self.prepare_folders(time_frames)
 
         async with aiohttp.ClientSession() as session:
             tasks = []
@@ -168,6 +171,7 @@ class AsyncCryptoDataFetcher:
         """
         results = {}
         endpoint = "/futures/data/takerlongshortRatio"
+        self.prepare_folders(time_frames)
 
         async with aiohttp.ClientSession() as session:
             tasks = []
@@ -221,6 +225,7 @@ class AsyncCryptoDataFetcher:
         """
         results = {}
         endpoint = "/futures/data/openInterestHist"
+        self.prepare_folders(time_frames)
 
         async with aiohttp.ClientSession() as session:
             tasks = []
@@ -278,6 +283,7 @@ class AsyncCryptoDataFetcher:
         Возвращает dict {(futures, timeframe): DataFrame}
         """
         result = {}
+        self.prepare_folders(time_frames)
 
         price_dict = await self.download_price(futures_list, time_frames, limit, save=save)
         delta_dict = await self.download_delta(futures_list, time_frames, limit, save=save)

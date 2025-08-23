@@ -17,6 +17,7 @@ router = Router()
 @router.callback_query(F.data == "list_futures")
 async def list_futures(callback: types.CallbackQuery, state: FSMContext):
 
+    await callback.answer()
     await callback.message.edit_text(
         text=t.futures_selection_msg,
         reply_markup=await k.get_objects_keyboard()
@@ -27,6 +28,7 @@ async def list_futures(callback: types.CallbackQuery, state: FSMContext):
 @router.callback_query(F.data == "enter_futures")
 async def enter_futures(callback: types.CallbackQuery, state: FSMContext):
 
+    await callback.answer()
     new_msg = await callback.message.edit_text(
         text=t.enter_futures_msg,
         reply_markup=k.go_menu_user
@@ -74,6 +76,7 @@ async def received_futures_name(message: Message, state: FSMContext):
 @router.callback_query(F.data.startswith("futures:"))
 async def futures_choice(callback: types.CallbackQuery, state: FSMContext):
 
+    await callback.answer()
     await state.set_state(None)
     futures_name = callback.data.split(':')[1]
 
@@ -88,11 +91,12 @@ async def futures_choice(callback: types.CallbackQuery, state: FSMContext):
 # Обработка кнопок пагинации
 @router.callback_query(F.data.startswith("page:"))
 async def pagination_handler(callback: types.CallbackQuery):
+
+    await callback.answer()
     page = int(callback.data.split(":")[1])  # получаем номер страницы
     markup = await k.get_objects_keyboard(page=page)
 
     await callback.message.edit_reply_markup(reply_markup=markup) 
-    await callback.answer() 
 
 
 # Обработка выбранного таймфрейма
@@ -100,7 +104,6 @@ async def pagination_handler(callback: types.CallbackQuery):
 async def time_frame_choice(callback: types.CallbackQuery, state: FSMContext):
 
     await callback.answer()
-
     data = await state.get_data()
     list_timeframes = data.get('list_timeframes', [])
 
@@ -139,25 +142,24 @@ async def select_all_futures(callback: types.CallbackQuery, state: FSMContext):
 @router.callback_query(F.data == "start_analysis")
 async def start_analysis(callback: types.CallbackQuery, state: FSMContext):
 
-    # Проверка на наличие хотябы 1 фьючерса
+    await callback.answer()
     data = await state.get_data()
-    list_timeframes = data.get('list_timeframes', [])
+    futures_name = data.get('futures_name', ['BTCUSDT'])
+    list_timeframes = data.get('list_timeframes', ['1d'])
 
+    # Проверка на наличие хотябы 1 фьючерса
     if not list_timeframes:
         await callback.answer(
             text=t.select_timeframe_msg,
             show_alert=True
         )
         return
-
-
-    await callback.message.edit_text(t.start_data_collection_msg)
-    await asyncio.sleep(1)
-
-    await callback.message.edit_text(t.data_collection_finished_msg)
-    await asyncio.sleep(1)
-
-    await callback.message.edit_text(t.futures_analyzed_msg)
-    await asyncio.sleep(1)
+    
+    # Анализ фьючерса
+    await u.futures_analysis(
+        callback=callback,
+        futures_name=[futures_name],
+        list_timeframes=list_timeframes
+    )
     
     await state.clear()

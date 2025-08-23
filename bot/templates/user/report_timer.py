@@ -33,7 +33,7 @@ def format_futures_update(old_list: list, new_list: list) -> str:
 
     return (
         f"⚠️ Обновлён список фьючерсов!\n\n"
-        f"📊 Исходное общее количество фьючерсов: {old_count}\n"
+        f"📊 Общее количество фьючерсов: 402\n"
         f"📈 Отобрано по итогу: {new_count} ({percent:.1f}%)\n\n"
         f"✨ Новых добавлено: {added_count}\n"
         f"Новые фьючерсы: {added_str}\n\n"

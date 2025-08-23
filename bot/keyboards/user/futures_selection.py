@@ -16,7 +16,7 @@ async def get_objects_keyboard(page: int = 0, OBJECTS_PER_PAGE: int = 9):
 
     objects = await Futures.get(id=1)
     if not objects or not objects.futures:
-        return InlineKeyboardMarkup(inline_keyboard=[])
+        return InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="🔙 Меню", callback_data="go_menu_user")]])
 
     list_futures = objects.futures
     total_items = len(list_futures)
