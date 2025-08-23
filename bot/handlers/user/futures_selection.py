@@ -1,6 +1,7 @@
-import asyncio
+import os
 from aiogram.types import Message
 from aiogram import Router, F, types
+from aiogram.types import FSInputFile
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 
@@ -156,10 +157,20 @@ async def start_analysis(callback: types.CallbackQuery, state: FSMContext):
         return
     
     # Анализ фьючерса
-    await u.futures_analysis(
+    files_path = await u.futures_analysis(
         callback=callback,
         futures_name=[futures_name],
         list_timeframes=list_timeframes
     )
-    
+
+    # Отправляем графики
+    for file_path in files_path:
+
+        file = FSInputFile(file_path)
+        await bot.send_document(
+            chat_id=callback.from_user.id,
+            document=file,
+        )
+        os.remove(file_path)
+        
     await state.clear()

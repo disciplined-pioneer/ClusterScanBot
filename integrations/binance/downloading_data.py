@@ -34,7 +34,7 @@ class AsyncCryptoDataFetcher:
 
     BASE_URL = "https://fapi.binance.com"
 
-    def __init__(self, save_dir: str = "data", concurrency: int = 20):
+    def __init__(self, save_dir: str = "data/klines", concurrency: int = 20):
         """
         :param save_dir: директория для сохранения CSV
         """

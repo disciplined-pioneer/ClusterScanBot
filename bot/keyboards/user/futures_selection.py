@@ -2,7 +2,8 @@ import math
 from db.psql.models.models import Futures
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-ALL_LIST_TIMEFRAMES = ['1d', '4h', '1h', '30m', '15m', '5m']
+from utils.user.futures_selection import ALL_LIST_TIMEFRAMES
+
 
 go_menu_user = InlineKeyboardMarkup(
     inline_keyboard=[
