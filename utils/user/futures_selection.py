@@ -1,4 +1,5 @@
 import json
+import time
 from pathlib import Path
 from aiogram import types
 from aiogram.fsm.state import State, StatesGroup
@@ -61,6 +62,7 @@ def check_futures_presence(futures_name: str, json_path: str = "data/all_futures
 async def futures_analysis(callback: types.CallbackQuery, list_timeframes: list, futures_name: list):
 
     # Старт сбора данных
+    start = time.time()
     await callback.message.edit_text(t.start_data_collection_msg)
     sorted_tfs = sort_timeframes(list_timeframes)
     senior_tfs, junior_tfs = split_timeframes(sorted_tfs)
@@ -110,8 +112,9 @@ async def futures_analysis(callback: types.CallbackQuery, list_timeframes: list,
             )
 
     # Список всех путей к файлам
+    end = time.time()
     files = visualizer.get_saved_files()
-    logger.info(f"Сохранено файлов: {len(files)}")
+    logger.info(f"Сохранено файлов: {len(files)} - ({end-start:.2f} сек)")
 
     logger.info('Анализ фьючерса завершён!')
     await callback.message.edit_text(t.futures_analyzed_msg)

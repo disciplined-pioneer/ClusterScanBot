@@ -143,34 +143,38 @@ async def select_all_futures(callback: types.CallbackQuery, state: FSMContext):
 @router.callback_query(F.data == "start_analysis")
 async def start_analysis(callback: types.CallbackQuery, state: FSMContext):
 
-    await callback.answer()
-    data = await state.get_data()
-    futures_name = data.get('futures_name', ['BTCUSDT'])
-    list_timeframes = data.get('list_timeframes', ['1d'])
+    try:
+        await callback.answer()
+        data = await state.get_data()
+        futures_name = data.get('futures_name', ['BTCUSDT'])
+        list_timeframes = data.get('list_timeframes', ['1d'])
 
-    # Проверка на наличие хотябы 1 фьючерса
-    if not list_timeframes:
-        await callback.answer(
-            text=t.select_timeframe_msg,
-            show_alert=True
-        )
-        return
-    
-    # Анализ фьючерса
-    files_path = await u.futures_analysis(
-        callback=callback,
-        futures_name=[futures_name],
-        list_timeframes=list_timeframes
-    )
-
-    # Отправляем графики
-    for file_path in files_path:
-
-        file = FSInputFile(file_path)
-        await bot.send_document(
-            chat_id=callback.from_user.id,
-            document=file,
-        )
-        os.remove(file_path)
+        # Проверка на наличие хотябы 1 фьючерса
+        if not list_timeframes:
+            await callback.answer(
+                text=t.select_timeframe_msg,
+                show_alert=True
+            )
+            return
         
+        # Анализ фьючерса
+        files_path = await u.futures_analysis(
+            callback=callback,
+            futures_name=[futures_name],
+            list_timeframes=list_timeframes
+        )
+
+        # Отправляем графики
+        for file_path in files_path:
+
+            file = FSInputFile(file_path)
+            await bot.send_document(
+                chat_id=callback.from_user.id,
+                document=file,
+            )
+            os.remove(file_path)
+
+    except Exception as e:
+        await callback.message.edit_text(f'❗️ Ошибка при обработке фьючерса: {e}')
+
     await state.clear()
