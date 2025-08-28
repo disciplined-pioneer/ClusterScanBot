@@ -13,7 +13,7 @@ from integrations.binance.downloading_data import AsyncCryptoDataFetcher, volume
 
 class TaskScheduler:
 
-    def __init__(self, interval_days: int = 3):
+    def __init__(self, interval_days: int = 1):
         """
         Планировщик задач.
         :param interval_days: Интервал в днях между запусками задачи.

@@ -21,7 +21,7 @@ logging.basicConfig(
 dp = Dispatcher()
 dp.include_routers(*routers)
 
-scheduler = TaskScheduler(interval_days=3)
+scheduler = TaskScheduler(interval_days=1)
 
 async def main():
 
@@ -31,7 +31,7 @@ async def main():
         scope=BotCommandScopeDefault()
     )
     
-    #asyncio.create_task(scheduler.start())
+    asyncio.create_task(scheduler.start())
 
     await dp.start_polling(bot)
 
