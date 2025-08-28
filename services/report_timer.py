@@ -39,7 +39,7 @@ class TaskScheduler:
         # scale_by='row' → стандартизация по строкам (по каждому фьючерсу)
         detector = AnomalyDetector(contamination=0.05, scale_by='row')
         result = detector.run(df_vol, columns="ALL", direction='up')
-        result.to_csv("VOLUME.csv")
+        #result.to_csv("VOLUME.csv")
 
         # Изменяем в базе список фьючерсов
         new_list_futures = result[result['is_anomaly']].index.tolist()
