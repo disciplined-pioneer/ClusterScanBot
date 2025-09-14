@@ -7,7 +7,7 @@ from mplfinance.original_flavor import candlestick_ohlc
 
 class FuturesVisualizer:
 
-    def __init__(self, save_dir: str = "data/chats"):
+    def __init__(self, save_dir: str = r"data\chats"):
         self.save_dir = save_dir
         os.makedirs(save_dir, exist_ok=True)
         self.saved_files = []

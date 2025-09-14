@@ -118,5 +118,6 @@ async def futures_analysis(callback: types.CallbackQuery, list_timeframes: list,
 
     logger.info('Анализ фьючерса завершён!')
     await callback.message.edit_text(t.futures_analyzed_msg)
-
+    
+    visualizer.saved_files = []
     return files
