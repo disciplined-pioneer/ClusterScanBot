@@ -144,10 +144,10 @@ async def select_all_futures(callback: types.CallbackQuery, state: FSMContext):
 async def start_analysis(callback: types.CallbackQuery, state: FSMContext):
 
     try:
-        await callback.answer()
         data = await state.get_data()
-        futures_name = data.get('futures_name', ['BTCUSDT'])
-        list_timeframes = data.get('list_timeframes', ['1d'])
+        futures_name = data.get('futures_name', [])
+        list_timeframes = data.get('list_timeframes', [])
+        print(list_timeframes, futures_name)
 
         # Проверка на наличие хотябы 1 фьючерса
         if not list_timeframes:
@@ -168,11 +168,11 @@ async def start_analysis(callback: types.CallbackQuery, state: FSMContext):
         for file_path in files_path:
 
             file = FSInputFile(file_path)
-            await bot.send_document(
-                chat_id=callback.from_user.id,
-                document=file,
-            )
-            os.remove(file_path)
+            try:
+                await bot.send_document(chat_id=callback.from_user.id, document=file)
+            finally:
+                os.remove(file_path)
+
 
     except Exception as e:
         await callback.message.edit_text(f'❗️ Ошибка при обработке фьючерса: {e}')
