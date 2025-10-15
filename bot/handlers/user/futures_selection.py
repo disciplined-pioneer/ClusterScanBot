@@ -10,6 +10,9 @@ import utils.user.futures_selection as u
 import bot.keyboards.user.futures_selection as k
 import bot.templates.user.futures_selection as t
 
+from bot.keyboards.user.commands import futures_menu
+from bot.templates.user.commands import start_user_msg
+
 
 router = Router()
 
@@ -147,7 +150,6 @@ async def start_analysis(callback: types.CallbackQuery, state: FSMContext):
         data = await state.get_data()
         futures_name = data.get('futures_name', [])
         list_timeframes = data.get('list_timeframes', [])
-        print(list_timeframes, futures_name)
 
         # Проверка на наличие хотябы 1 фьючерса
         if not list_timeframes:
@@ -173,6 +175,10 @@ async def start_analysis(callback: types.CallbackQuery, state: FSMContext):
             finally:
                 os.remove(file_path)
 
+        await callback.message.answer(
+            text=start_user_msg,
+            reply_markup=futures_menu
+        )
 
     except Exception as e:
         await callback.message.edit_text(f'❗️ Ошибка при обработке фьючерса: {e}')

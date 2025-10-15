@@ -31,7 +31,7 @@ async def main():
         scope=BotCommandScopeDefault()
     )
     
-    #asyncio.create_task(scheduler.start())
+    asyncio.create_task(scheduler.start())
 
     await dp.start_polling(bot)
 
