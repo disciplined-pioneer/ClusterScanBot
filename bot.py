@@ -21,7 +21,7 @@ logging.basicConfig(
 dp = Dispatcher()
 dp.include_routers(*routers)
 
-scheduler = TaskScheduler(interval_days=1)
+scheduler = TaskScheduler(interval_hours=6)
 
 async def main():
 

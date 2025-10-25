@@ -13,12 +13,12 @@ from integrations.binance.downloading_data import AsyncCryptoDataFetcher, volume
 
 class TaskScheduler:
 
-    def __init__(self, interval_days: int = 1):
+    def __init__(self, interval_hours: int = 6):
         """
         Планировщик задач.
-        :param interval_days: Интервал в днях между запусками задачи.
+        :param interval_hours: Интервал в часах между запусками задачи.
         """
-        self.interval_seconds = interval_days * 24 * 60 * 60
+        self.interval_hours = interval_hours
         self._stop_event = asyncio.Event()
 
     async def task(self):
@@ -33,19 +33,14 @@ class TaskScheduler:
         logger.info('Данные были скачаны!')
 
         # Анализ с помощью изоляционного леса
-        logger.info("Фильтруем фьючерсы...")
-        df_vol = volumes_table(combined_data, tf="15m", bars=288)
-
         # scale_by='row' → стандартизация по строкам (по каждому фьючерсу)
-        detector = AnomalyDetector(contamination=0.05, scale_by='row')
+        df_vol = volumes_table(combined_data, tf="15m", bars=288)
+        detector = AnomalyDetector(contamination=0.1, scale_by='row')
         result = detector.run(df_vol, columns="ALL", direction='up')
-        #result.to_csv("VOLUME.csv")
 
         # Изменяем в базе список фьючерсов
         new_list_futures = result[result['is_anomaly']].index.tolist()
         object_futures = await Futures.get(id=1)
-
-        # Гарантируем, что old_list_futures всегда определён
         old_list_futures = object_futures.futures if object_futures else []
 
         if object_futures is None and new_list_futures:
@@ -73,17 +68,30 @@ class TaskScheduler:
         except Exception as e:
             logger.exception(f"❌ Ошибка при выполнении задачи: {e}")
 
-        next_run_time = datetime.now() + timedelta(seconds=self.interval_seconds)
-        logger.info(f"🔁 Следующий запуск: {next_run_time:%Y-%m-%d %H:%M:%S}")
-
     async def start(self):
-        """Запуск основного цикла."""
+        """Запуск основного цикла с синхронизацией по времени."""
+
+        # ⚡ Сначала запускаем задачу сразу
+        await self.run_once()
+
         while not self._stop_event.is_set():
-            await self.run_once()
+            now = datetime.now()
+
+            # Вычисляем следующий «ровный» час интервала (0,6,12,18)
+            next_hour = (now.hour // self.interval_hours + 1) * self.interval_hours
+            next_run = now.replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(hours=next_hour)
+
+            # Если время ушло за сутки, переносим на следующий день
+            if next_run <= now:
+                next_run += timedelta(hours=self.interval_hours)
+
+            sleep_seconds = (next_run - now).total_seconds()
+            logger.info(f"⏳ Ждём до следующего запуска: {next_run:%Y-%m-%d %H:%M:%S} ({sleep_seconds:.0f} секунд)")
+
             try:
-                await asyncio.wait_for(self._stop_event.wait(), timeout=self.interval_seconds)
+                await asyncio.wait_for(self._stop_event.wait(), timeout=sleep_seconds)
             except asyncio.TimeoutError:
-                continue  # интервал истёк — идём на следующий запуск
+                await self.run_once()
 
     def stop(self):
         """Остановка цикла."""
