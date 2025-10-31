@@ -9,6 +9,7 @@ import bot.templates.user.futures_selection as t
 
 from core.logger import filter_futures_logger as logger
 
+from integrations.binance.volume_profile import get_vap_levels
 from integrations.binance.downloading_data import AsyncCryptoDataFetcher
 from integrations.machine_learning.isolation_forest import AnomalyDetector
 
@@ -91,13 +92,15 @@ async def futures_analysis(callback: types.CallbackQuery, list_timeframes: list,
             logger.warning(f"[{tf}] Нет данных для анализа!")
             continue
 
-        # Поиск аномалий
+        # Поиск аномалий и уровней
         result = detector.run(df, columns="volume", direction='up')
+        vap_levels = get_vap_levels(df)
 
         # Создаём графики
         if tf in junior_tfs:
             visualizer.visualize_anomalies_junior(
                 data=result,
+                vap_levels=vap_levels,
                 futures_name=futures_name[0],
                 time_frame=tf,
                 number=n
@@ -106,6 +109,7 @@ async def futures_analysis(callback: types.CallbackQuery, list_timeframes: list,
         if tf in senior_tfs:
             visualizer.visualize_anomalies_senior(
                 data=result,
+                vap_levels=vap_levels,
                 futures_name=futures_name[0],
                 time_frame=tf,
                 number=n

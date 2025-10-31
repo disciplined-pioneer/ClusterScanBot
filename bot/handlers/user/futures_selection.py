@@ -151,7 +151,7 @@ async def start_analysis(callback: types.CallbackQuery, state: FSMContext):
         futures_name = data.get('futures_name', [])
         list_timeframes = data.get('list_timeframes', [])
 
-        # Проверка на наличие хотябы 1 фьючерса
+        # Проверка на наличие хотя бы 1 фьючерса
         if not list_timeframes:
             await callback.answer(
                 text=t.select_timeframe_msg,
@@ -168,7 +168,6 @@ async def start_analysis(callback: types.CallbackQuery, state: FSMContext):
 
         # Отправляем графики
         for file_path in files_path:
-
             file = FSInputFile(file_path)
             try:
                 await bot.send_document(chat_id=callback.from_user.id, document=file)

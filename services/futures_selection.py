@@ -23,7 +23,7 @@ class FuturesVisualizer:
         self.saved_files.append(file_path)
         return file_path
 
-    def visualize_anomalies_junior(self, data, futures_name: str, time_frame: str, number: int=1):
+    def visualize_anomalies_junior(self, data, vap_levels: list, futures_name: str, time_frame: str, number: int=1):
         """График с аномалиями и кумулятивной дельтой"""
         cum_delta = data["delta"].cumsum()
         anomaly = data[data["is_anomaly"]]
@@ -39,6 +39,11 @@ class FuturesVisualizer:
             width=0.6, colorup='g', colordown='r', alpha=0.5
         )
 
+        # Рисуем уровни
+        for levels, color in vap_levels:
+            for level in levels.values():
+                ax[0].axhline(level, color=color, linestyle="-", linewidth=1)
+
         ax[0].plot(anomaly.index, anomaly["close"], "bs", alpha=0.6,
                    markersize=8, label="Аномалия - кластер")
         ax[0].set_title(f"Ценовые данные с аномалиями. График: {futures_name}, ТФ: {time_frame}")
@@ -49,7 +54,7 @@ class FuturesVisualizer:
         plt.tight_layout()
         return self._save_plot(fig, futures_name, time_frame, number)
 
-    def visualize_anomalies_senior(self, data, futures_name: str, time_frame: str, number: int=1):
+    def visualize_anomalies_senior(self, data, vap_levels: list, futures_name: str, time_frame: str, number: int=1):
         """График только с аномалиями"""
         anomaly = data[data["is_anomaly"]]
 
@@ -61,6 +66,11 @@ class FuturesVisualizer:
             zip(np.arange(len(data)), data['open'], data['high'], data['low'], data['close']),
             width=0.6, colorup='g', colordown='r', alpha=0.5
         )
+
+        # Рисуем уровни
+        for levels, color in vap_levels:
+            for level in levels.values():
+                ax.axhline(level, color=color, linestyle="-", linewidth=1)
 
         ax.plot(anomaly.index, anomaly["close"], "bs", alpha=0.6,
                 markersize=8, label="Аномалия - кластер")

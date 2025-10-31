@@ -22,22 +22,11 @@ router.message.filter(F.chat.type == "private")
 async def new_user_start(message: Message, state: FSMContext):
 
     # Очистка истории сообщений
-    if not settings.bot.ADMINS:
-        data = await state.get_data()
-        report_id = data.get("report", message.message_id - 90)
-        try:
-            await bot.delete_messages(
-                message.chat.id,
-                list(range(max(1, message.message_id - 90, report_id + 1), message.message_id + 1))
-            )
-        except Exception:
-            pass
-
+    if message.from_user.id not in settings.bot.ADMINS:
         return
-    else:
-        await message.delete()
     
     # Добавляем в БД
+    await message.delete()
     tg_id = message.from_user.id
     username = message.from_user.username
     await Users.create(tg_id=tg_id, username=username)
@@ -59,21 +48,10 @@ async def start_command(message: Message, state: FSMContext):
     :return:
     """
     # Очистка истории сообщений
-    if not settings.bot.ADMINS:
-        data = await state.get_data()
-        report_id = data.get("report", message.message_id - 90)
-        try:
-            await bot.delete_messages(
-                message.chat.id,
-                list(range(max(1, message.message_id - 90, report_id + 1), message.message_id + 1))
-            )
-        except Exception:
-            pass
-
+    if message.from_user.id not in settings.bot.ADMINS:
         return
-    else:
-        await message.delete()
-    
+
+    await message.delete()
     await message.answer(
         text=t.start_user_msg,
         reply_markup=k.futures_menu
