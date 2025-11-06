@@ -241,6 +241,7 @@ class VAFuturesData(Base, ModelAdmin):
     id: Mapped[intpk]
     date: Mapped[datetime] = mapped_column(default=now_moscow)
     futures: Mapped[str]
+    timeframe: Mapped[str]
     price: Mapped[float]
     percent: Mapped[float] = mapped_column(comment="Сколько осталось до ближ. уровня в %")
     info: Mapped[dict] = mapped_column(

@@ -28,6 +28,20 @@ reporter = VAFuturesReporter()
 scheduler = TaskScheduler(interval_hours=6)
 
 
+async def start_background_tasks():
+
+    # Список аномальных фьючерсов
+    task1 = asyncio.create_task(scheduler.start())
+    
+    # ждём небольшую паузу, чтобы task1 точно стартовал
+    await asyncio.sleep(1)
+    
+    # Поиск VA у фьючерсов
+    task2 = asyncio.create_task(reporter.start())
+    
+    await asyncio.gather(task1, task2)
+
+
 async def main():
 
     await init_postgres()
@@ -36,8 +50,7 @@ async def main():
         scope=BotCommandScopeDefault()
     )
     
-    asyncio.create_task(scheduler.start()) # Список аномальных фьючерсов
-    asyncio.create_task(reporter.start()) # Поиск VA у фьючерсов
+    asyncio.create_task(start_background_tasks())
 
     await dp.start_polling(bot)
 
