@@ -231,3 +231,20 @@ class Futures(Base, ModelAdmin):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     futures: Mapped[list] = mapped_column(JSONB, nullable=False, default=list)
+
+
+# Для хранения данных по VA фьючерсам.
+class VAFuturesData(Base, ModelAdmin):
+
+    __tablename__ = "va_futures_data"
+
+    id: Mapped[intpk]
+    date: Mapped[datetime] = mapped_column(default=now_moscow)
+    futures: Mapped[str]
+    price: Mapped[float]
+    percent: Mapped[float] = mapped_column(comment="Сколько осталось до ближ. уровня в %")
+    info: Mapped[dict] = mapped_column(
+        JSONB,
+        nullable=False,
+        comment="Структурированные данные по VA (пример: {'4h': {'vah':123, 'poc':2342, 'val':23432}, '1h': {...}})"
+    )

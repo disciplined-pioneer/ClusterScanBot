@@ -9,7 +9,8 @@ from bot.handlers import routers
 from settings import settings
 from db.psql.crud.base import init_postgres
 
-from services.report_timer import TaskScheduler
+from services.futures_update import TaskScheduler
+from services.va_futures_reporter import VAFuturesReporter
 
 
 logging.basicConfig(
@@ -21,7 +22,11 @@ logging.basicConfig(
 dp = Dispatcher()
 dp.include_routers(*routers)
 
+
+# Классы с фоновыми задачами
+reporter = VAFuturesReporter()
 scheduler = TaskScheduler(interval_hours=6)
+
 
 async def main():
 
@@ -31,7 +36,8 @@ async def main():
         scope=BotCommandScopeDefault()
     )
     
-    #asyncio.create_task(scheduler.start())
+    asyncio.create_task(scheduler.start()) # Список аномальных фьючерсов
+    asyncio.create_task(reporter.start()) # Поиск VA у фьючерсов
 
     await dp.start_polling(bot)
 

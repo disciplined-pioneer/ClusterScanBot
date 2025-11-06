@@ -28,5 +28,6 @@ def create_logger(name: str, log_file: str, level=logging.INFO):
     return logger
 
 # Логгеры
-downloading_data_logger = create_logger("downloading_data_logger", "downloading_data_logger.log")
+va_futures_logger = create_logger("va_futures_logger", "va_futures_logger.log")
 filter_futures_logger = create_logger("filter_futures_logger", "filter_futures_logger.log")
+downloading_data_logger = create_logger("downloading_data_logger", "downloading_data_logger.log")
