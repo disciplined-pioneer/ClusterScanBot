@@ -19,6 +19,7 @@ logging.basicConfig(
     datefmt='%Y-%m-%d %H:%M:%S'
 )
 
+
 dp = Dispatcher()
 dp.include_routers(*routers)
 
@@ -33,8 +34,8 @@ async def start_background_tasks():
     # Список аномальных фьючерсов
     task1 = asyncio.create_task(scheduler.start())
     
-    # ждём небольшую паузу, чтобы task1 точно стартовал
-    await asyncio.sleep(1)
+    # Ждём создания списка фьючерсов
+    await asyncio.sleep(60)
     
     # Поиск VA у фьючерсов
     task2 = asyncio.create_task(reporter.start())

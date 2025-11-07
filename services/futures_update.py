@@ -71,7 +71,7 @@ class TaskScheduler:
     async def start(self):
         """Запуск основного цикла с синхронизацией по времени."""
 
-        # ⚡ Сначала запускаем задачу сразу
+        # Сначала запускаем задачу сразу
         await self.run_once()
 
         while not self._stop_event.is_set():

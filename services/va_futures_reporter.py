@@ -4,6 +4,7 @@ from datetime import datetime
 from aiogram.types import FSInputFile
 
 from core.bot import bot
+from settings import settings
 from core.logger import va_futures_logger as logger
 
 from db.psql.models.models import VAFuturesData, Futures
@@ -81,7 +82,16 @@ class VAFuturesReporter:
                 info=clean_levels
             )
 
-        logger.info("✅ Поиск VA завершён.")
+        logger.info("✅ Поиск VA завершён")
+
+        for tg_id in settings.bot.ADMINS:
+            try:
+                await bot.send_message(
+                    chat_id=tg_id,
+                    text=f'✅ Уровни были успешно обновлены!'
+                )
+            except:
+                pass
 
     def stop(self):
         """
