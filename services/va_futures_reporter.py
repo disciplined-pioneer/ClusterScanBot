@@ -1,7 +1,4 @@
-import os
 import asyncio
-from datetime import datetime
-from aiogram.types import FSInputFile
 
 from core.bot import bot
 from settings import settings

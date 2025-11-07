@@ -11,6 +11,7 @@ from db.psql.crud.base import init_postgres
 
 from services.futures_update import TaskScheduler
 from services.va_futures_reporter import VAFuturesReporter
+from services.near_levels_finder import VAProximityScanner
 
 
 logging.basicConfig(
@@ -24,23 +25,26 @@ dp = Dispatcher()
 dp.include_routers(*routers)
 
 
-# Классы с фоновыми задачами
+# Классы для фоновых задач
 reporter = VAFuturesReporter()
 scheduler = TaskScheduler(interval_hours=6)
+scanner = VAProximityScanner(interval_minutes=5, proximity_percent=1)
 
 
 async def start_background_tasks():
 
     # Список аномальных фьючерсов
     task1 = asyncio.create_task(scheduler.start())
-    
-    # Ждём создания списка фьючерсов
     await asyncio.sleep(60)
     
     # Поиск VA у фьючерсов
     task2 = asyncio.create_task(reporter.start())
+    await asyncio.sleep(60)
+
+    # Сканнер проверки близости к уровням
+    task3 = asyncio.create_task(scanner.start())
     
-    await asyncio.gather(task1, task2)
+    await asyncio.gather(task1, task2, task3)
 
 
 async def main():

@@ -316,6 +316,15 @@ class AsyncCryptoDataFetcher:
 
         return result
     
+    async def get_futures_prices(self):
+        """
+        Возвращает цены всех фьючерсов
+        """
+        async with aiohttp.ClientSession() as session:
+            async with session.get(f"{self.BASE_URL}/fapi/v1/ticker/price") as resp:
+                data = await resp.json()
+                return {item['symbol']: float(item['price']) for item in data}
+
     async def close(self):
         if self.session and not self.session.closed:
             await self.session.close()
