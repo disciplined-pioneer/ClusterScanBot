@@ -28,7 +28,7 @@ dp.include_routers(*routers)
 # Классы для фоновых задач
 reporter = VAFuturesReporter()
 scheduler = TaskScheduler(interval_hours=6)
-scanner = VAProximityScanner(interval_minutes=5, proximity_percent=1)
+scanner = VAProximityScanner(interval_minutes=30, proximity_percent=1)
 
 
 async def start_background_tasks():

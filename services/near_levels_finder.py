@@ -49,7 +49,15 @@ class VAProximityScanner:
         """
         futures_data = await VAFuturesData.all()
         if not futures_data:
-            logger.warning("⚠️ Нет данных о VA-уровнях.")
+            for admin_id in settings.bot.ADMINS:
+                try:
+                    await bot.send_message(
+                        chat_id=admin_id,
+                        text="⚠️ Нет данных о VA-уровнях"
+                    )
+                except:
+                    pass
+            logger.warning("⚠️ Нет данных о VA-уровнях")
             return
 
         near_levels = []
@@ -77,8 +85,21 @@ class VAProximityScanner:
                         near_levels.append((symbol, key, tf, level_price, current_price, diff_percent))
                         logger.info(f"🎯 {symbol} ({tf}): {current_price} близко к {key}={level_price} ({diff_percent:.2f}%)")
 
+            # Удаляем уровень из БД, чтобы не было дублирования
+            info_level = await VAFuturesData.get(id=record.id)
+            await info_level.delete()
+
+        # Отправка сообщения админам
         if not near_levels:
-            logger.info("📉 Нет фьючерсов, близких к уровням.")
+            for admin_id in settings.bot.ADMINS:
+                try:
+                    await bot.send_message(
+                        chat_id=admin_id,
+                        text="📉 Нет фьючерсов, близких к уровням"
+                    )
+                except:
+                    pass
+            logger.info("📉 Нет фьючерсов, близких к уровням")
             return
         else:
             await self.notify_admins(near_levels)
