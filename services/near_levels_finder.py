@@ -127,7 +127,7 @@ class VAProximityScanner:
                 await bot.send_message(
                     chat_id=admin_id,
                     text=text,
-                    reply_markup=await k.get_objects_keyboard(list_futures=list_futures, callback='futures_va:', back=False)
+                    reply_markup=await k.get_objects_keyboard(list_futures=list_futures, callback='futures_va:', back=False, OBJECTS_PER_PAGE=100)
                 )
             except Exception as e:
                 logger.warning(f"Не удалось отправить сообщение админу {admin_id}: {e}")
