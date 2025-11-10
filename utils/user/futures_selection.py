@@ -37,6 +37,23 @@ def split_timeframes(timeframes: list[str]) -> tuple[list[str], list[str]]:
     return senior, junior
 
 
+def normalize_symbol(symbol: str) -> str:
+    """Приводит тикер фьючерса к формату BTCUSDT вне зависимости от ввода."""
+    symbol = symbol.strip().upper()
+    symbol = symbol.replace("/", "").replace("-", "")
+
+    # если тикер уже оканчивается на USDT
+    if symbol.endswith("USDT"):
+        return symbol
+
+    # если тикер заканчивается на USD — добавим T
+    if symbol.endswith("USD"):
+        return symbol + "T"
+
+    # если указана только база, добавляем USDT
+    return symbol + "USDT"
+
+
 def check_futures_presence(futures_name: str, json_path: str = "data/all_futures.json") -> str | None:
     """
     Проверяет, есть ли futures_name в JSON-массиве.
@@ -45,7 +62,7 @@ def check_futures_presence(futures_name: str, json_path: str = "data/all_futures
     :param json_path: Путь к JSON-файлу с массивом фьючерсов
     :return: None, если фьючерс найден; иначе текст ошибки с введённым именем
     """
-    futures_name_clean = futures_name.strip().upper()
+    futures_name_clean = normalize_symbol(futures_name)
 
     try:
         with open(Path(json_path), "r", encoding="utf-8") as f:

@@ -13,6 +13,8 @@ import bot.templates.user.futures_selection as t
 from bot.keyboards.user.commands import futures_menu
 from bot.templates.user.commands import start_user_msg
 
+from db.psql.models.models import Futures
+
 
 router = Router()
 
@@ -21,10 +23,13 @@ router = Router()
 @router.callback_query(F.data == "list_futures")
 async def list_futures(callback: types.CallbackQuery, state: FSMContext):
 
+    objects = await Futures.get(id=1)
+    list_futures = objects.futures
+
     await callback.answer()
     await callback.message.edit_text(
         text=t.futures_selection_msg,
-        reply_markup=await k.get_objects_keyboard()
+        reply_markup=await k.get_objects_keyboard(list_futures=list_futures)
     )
 
 
@@ -92,13 +97,32 @@ async def futures_choice(callback: types.CallbackQuery, state: FSMContext):
     await state.update_data(futures_name=futures_name)
 
 
+# Обработка выбранного фьючерса VA
+@router.callback_query(F.data.startswith("futures_va:"))
+async def futuresva_choice(callback: types.CallbackQuery, state: FSMContext):
+
+    await callback.answer()
+    await state.set_state(None)
+    futures_name = callback.data.split(':')[1]
+
+    await callback.message.answer(
+        text=t.format_timeframes_message(futures_name),
+        reply_markup=k.get_timeframes_keyboard(back=False)
+    )
+
+    await state.update_data(futures_name=futures_name)
+
+
 # Обработка кнопок пагинации
 @router.callback_query(F.data.startswith("page:"))
 async def pagination_handler(callback: types.CallbackQuery):
 
     await callback.answer()
+    objects = await Futures.get(id=1)
+    list_futures = objects.futures
+
     page = int(callback.data.split(":")[1])  # получаем номер страницы
-    markup = await k.get_objects_keyboard(page=page)
+    markup = await k.get_objects_keyboard(page=page, list_futures=list_futures)
 
     await callback.message.edit_reply_markup(reply_markup=markup) 
 

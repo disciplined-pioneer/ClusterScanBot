@@ -5,6 +5,8 @@ from settings import settings
 from core.logger import va_futures_logger as logger
 
 import utils.user.futures_selection as u
+import bot.keyboards.user.futures_selection as k
+
 from db.psql.models.models import VAFuturesData
 
 
@@ -85,9 +87,9 @@ class VAProximityScanner:
                         near_levels.append((symbol, key, tf, level_price, current_price, diff_percent))
                         logger.info(f"🎯 {symbol} ({tf}): {current_price} близко к {key}={level_price} ({diff_percent:.2f}%)")
 
-            # Удаляем уровень из БД, чтобы не было дублирования
-            info_level = await VAFuturesData.get(id=record.id)
-            await info_level.delete()
+                        # Удаляем уровень из БД, чтобы не было дублирования
+                        info_level = await VAFuturesData.get(id=record.id)
+                        await info_level.delete()
 
         # Отправка сообщения админам
         if not near_levels:
@@ -110,17 +112,23 @@ class VAProximityScanner:
         """
         text_lines = ["📊 <b>Фьючерсы, близкие к важным уровням:</b>\n"]
 
+        list_futures = []
         for symbol, key, tf, level_price, current_price, diff_percent in near_levels:
             text_lines.append(
                 f"• <b>{symbol} ({tf})</b> — текущая {current_price:.4f}, уровень {key}={level_price:.4f}"
                 f"({diff_percent:.2f}% от уровня)\n"
             )
+            list_futures.append(symbol)
 
         text = "\n".join(text_lines)
 
         for admin_id in settings.bot.ADMINS:
             try:
-                await bot.send_message(chat_id=admin_id, text=text, parse_mode="HTML")
+                await bot.send_message(
+                    chat_id=admin_id,
+                    text=text,
+                    reply_markup=await k.get_objects_keyboard(list_futures=list_futures, callback='futures_va:', back=False)
+                )
             except Exception as e:
                 logger.warning(f"Не удалось отправить сообщение админу {admin_id}: {e}")
 

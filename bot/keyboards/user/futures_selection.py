@@ -1,5 +1,4 @@
 import math
-from db.psql.models.models import Futures
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 from utils.user.futures_selection import ALL_LIST_TIMEFRAMES
@@ -11,15 +10,13 @@ go_menu_user = InlineKeyboardMarkup(
     ]
 )
 
-async def get_objects_keyboard(page: int = 0, OBJECTS_PER_PAGE: int = 9):
+async def get_objects_keyboard(page: int = 0, OBJECTS_PER_PAGE: int = 9, list_futures: list=[], callback: str='futures:', back: bool=True):
 
     """Меню с пагинацией — выбора фьючерса"""
 
-    objects = await Futures.get(id=1)
-    if not objects or not objects.futures:
+    if not list_futures:
         return InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="🔙 Меню", callback_data="go_menu_user")]])
 
-    list_futures = objects.futures
     total_items = len(list_futures)
     total_pages = math.ceil(total_items / OBJECTS_PER_PAGE)
 
@@ -29,7 +26,7 @@ async def get_objects_keyboard(page: int = 0, OBJECTS_PER_PAGE: int = 9):
     buttons = [
         [InlineKeyboardButton(
             text=str(fut),
-            callback_data=f"futures:{fut}"
+            callback_data=f"{callback}{fut}"
         )]
         for i, fut in enumerate(list_futures[start:end], start=start)
     ]
@@ -60,11 +57,12 @@ async def get_objects_keyboard(page: int = 0, OBJECTS_PER_PAGE: int = 9):
         buttons.append([page_button])
         buttons.append(nav_buttons)
 
-    buttons.append([InlineKeyboardButton(text="🔙 Меню", callback_data="go_menu_user")])
+    if back:
+        buttons.append([InlineKeyboardButton(text="🔙 Меню", callback_data="go_menu_user")])
 
     return InlineKeyboardMarkup(inline_keyboard=buttons)
 
-def get_timeframes_keyboard(selected_timeframes: list[str] = None, callback_back: str='list_futures') -> InlineKeyboardMarkup:
+def get_timeframes_keyboard(selected_timeframes: list[str] = None, callback_back: str='list_futures', back: bool=True) -> InlineKeyboardMarkup:
 
     if selected_timeframes is None:
         selected_timeframes = []
@@ -82,6 +80,7 @@ def get_timeframes_keyboard(selected_timeframes: list[str] = None, callback_back
     buttons.append(action_buttons)
 
     # Кнопка меню отдельным рядом
-    buttons.append([InlineKeyboardButton(text="◀️ Назад", callback_data=callback_back)])
+    if back:
+        buttons.append([InlineKeyboardButton(text="◀️ Назад", callback_data=callback_back)])
 
     return InlineKeyboardMarkup(inline_keyboard=buttons)
