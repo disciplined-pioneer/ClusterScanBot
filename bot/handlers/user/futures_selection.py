@@ -87,6 +87,7 @@ async def futures_choice(callback: types.CallbackQuery, state: FSMContext):
 
     await callback.answer()
     await state.set_state(None)
+
     futures_name = callback.data.split(':')[1]
 
     await callback.message.edit_text(
@@ -107,10 +108,11 @@ async def futuresva_choice(callback: types.CallbackQuery, state: FSMContext):
 
     await callback.message.answer(
         text=t.format_timeframes_message(futures_name),
-        reply_markup=k.get_timeframes_keyboard(back=False)
+        reply_markup=k.get_timeframes_keyboard(back=False),
+        reply_to_message_id=callback.message.message_id
     )
 
-    await state.update_data(futures_name=futures_name)
+    await state.update_data(futures_name=futures_name, back=False)
 
 
 # Обработка кнопок пагинации
@@ -133,6 +135,7 @@ async def time_frame_choice(callback: types.CallbackQuery, state: FSMContext):
 
     await callback.answer()
     data = await state.get_data()
+    back = data.get('back', True)
     list_timeframes = data.get('list_timeframes', [])
 
     time_frame = callback.data.split(':')[1]
@@ -148,7 +151,7 @@ async def time_frame_choice(callback: types.CallbackQuery, state: FSMContext):
     await state.update_data(list_timeframes=list_timeframes)
 
     await callback.message.edit_reply_markup(
-        reply_markup=k.get_timeframes_keyboard(list_timeframes)
+        reply_markup=k.get_timeframes_keyboard(selected_timeframes=list_timeframes, back=back)
     )
 
 
@@ -157,12 +160,14 @@ async def time_frame_choice(callback: types.CallbackQuery, state: FSMContext):
 async def select_all_futures(callback: types.CallbackQuery, state: FSMContext):
 
     await callback.answer()
+    data = await state.get_data()
+    back = data.get('back', True)
     list_timeframes = set(k.ALL_LIST_TIMEFRAMES)  # множество для чистоты данных
 
     await state.update_data(list_timeframes=list(list_timeframes))
 
     await callback.message.edit_reply_markup(
-        reply_markup=k.get_timeframes_keyboard(list(list_timeframes))
+        reply_markup=k.get_timeframes_keyboard(selected_timeframes=list(list_timeframes), back=back)
     )
 
 
