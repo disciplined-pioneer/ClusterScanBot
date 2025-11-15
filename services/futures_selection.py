@@ -33,22 +33,40 @@ class FuturesVisualizer:
             2, 1, gridspec_kw={"height_ratios": [3, 1]}, figsize=(15, 10), dpi=200
         )
 
+        # --- свечи ---
         candlestick_ohlc(
             ax[0],
             zip(np.arange(len(data)), data['open'], data['high'], data['low'], data['close']),
             width=0.6, colorup='g', colordown='r', alpha=0.5
         )
 
-        # Рисуем уровни
+        # === ДОБАВЛЕН ОБЪЁМ ПОД СВЕЧАМИ ===
+        ax_vol = ax[0].twinx()
+        ax_vol.bar(
+            data.index,
+            data["volume"],
+            width=0.6,
+            alpha=0.25,
+            color="#000000"
+        )
+        ax_vol.set_yticks([])      # скрываем ось объёма
+        ax_vol.set_ylim(0, data["volume"].max() * 3)  # чтобы столбики были «низом» графика
+
+        # уровни
         for levels, color in vap_levels:
             for level in levels.values():
                 ax[0].axhline(level, color=color, linestyle="-", linewidth=1)
 
-        ax[0].plot(anomaly.index, anomaly["close"], "bs", alpha=0.6,
-                   markersize=8, label="Аномалия - кластер")
+        # аномалии
+        ax[0].plot(
+            anomaly.index, anomaly["close"],
+            "bs", alpha=0.6, markersize=8, label="Аномалия - кластер"
+        )
+
         ax[0].set_title(f"Ценовые данные с аномалиями. График: {futures_name}, ТФ: {time_frame}")
         ax[0].legend()
 
+        # кумулятивная дельта
         ax[1].plot(data.index, cum_delta, color="#696969")
 
         plt.tight_layout()
