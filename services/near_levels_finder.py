@@ -93,14 +93,6 @@ class VAProximityScanner:
 
         # Отправка сообщения админам
         if not near_levels:
-            for admin_id in settings.bot.ADMINS:
-                try:
-                    await bot.send_message(
-                        chat_id=admin_id,
-                        text="📉 Нет фьючерсов, близких к уровням"
-                    )
-                except:
-                    pass
             logger.info("📉 Нет фьючерсов, близких к уровням")
             return
         else:
