@@ -55,27 +55,49 @@ class FuturesVisualizer:
         return self._save_plot(fig, futures_name, time_frame, number)
 
     def visualize_anomalies_senior(self, data, vap_levels: list, futures_name: str, time_frame: str, number: int=1):
-        """График только с аномалиями"""
+        """График с аномалиями + вертикальный объём"""
         anomaly = data[data["is_anomaly"]]
 
         sns.set(style="darkgrid")
-        fig, ax = plt.subplots(figsize=(15, 8), dpi=200)
+        fig, ax = plt.subplots(
+            2, 1, gridspec_kw={"height_ratios": [3, 1]}, figsize=(15, 10), dpi=200
+        )
 
+        # Основной график — свечи
         candlestick_ohlc(
-            ax,
+            ax[0],
             zip(np.arange(len(data)), data['open'], data['high'], data['low'], data['close']),
             width=0.6, colorup='g', colordown='r', alpha=0.5
         )
 
-        # Рисуем уровни
+        # Уровни
         for levels, color in vap_levels:
             for level in levels.values():
-                ax.axhline(level, color=color, linestyle="-", linewidth=1)
+                ax[0].axhline(level, color=color, linestyle="-", linewidth=1)
 
-        ax.plot(anomaly.index, anomaly["close"], "bs", alpha=0.6,
-                markersize=8, label="Аномалия - кластер")
-        ax.set_title(f"Ценовые данные с аномалиями. График: {futures_name}, ТФ: {time_frame}")
-        ax.legend()
+        # Аномалии
+        ax[0].plot(
+            anomaly.index,
+            anomaly["close"],
+            "bs",
+            alpha=0.6,
+            markersize=8,
+            label="Аномалия - кластер"
+        )
+
+        # === ВЕРТИКАЛЬНЫЙ ОБЪЁМ ===
+        ax[1].bar(
+            data.index,
+            data["volume"],
+            color="#000000", 
+            alpha=0.35,
+            width=0.8,
+            align='center'
+        )
+
+        # Титл и легенда
+        ax[0].set_title(f"Ценовые данные с аномалиями. График: {futures_name}, ТФ: {time_frame}")
+        ax[0].legend()
 
         plt.tight_layout()
         return self._save_plot(fig, futures_name, time_frame, number)

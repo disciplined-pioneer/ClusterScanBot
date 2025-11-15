@@ -116,7 +116,7 @@ class VAProximityScanner:
         for symbol, key, tf, level_price, current_price, diff_percent in near_levels:
             text_lines.append(
                 f"• <b>{symbol} ({tf})</b> — текущая {current_price:.4f}, уровень {key}={level_price:.4f}"
-                f"({diff_percent:.2f}% от уровня)\n"
+                f" ({diff_percent:.2f}%)\n"
             )
             list_futures.append(symbol)
 
