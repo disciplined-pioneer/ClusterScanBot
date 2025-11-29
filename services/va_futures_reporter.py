@@ -57,7 +57,7 @@ class VAFuturesReporter:
 
         #all_futures = u.fetcher.load_futures_from_json(path='data/all_futures.json')
         combined_data = await u.fetcher.download_price(
-            all_futures, ['4h', '1h'], limit=500, save=False
+            all_futures, ['1d', '4h'], limit=500, save=False
         )
 
         # Удаляем старые уровни
