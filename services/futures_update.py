@@ -15,7 +15,7 @@ class TaskScheduler:
 
     def __init__(self, interval_hours: int = 6):
         """
-        Планировщик задач.
+        Планировщик задач для обновления фьючерсов.
         :param interval_hours: Интервал в часах между запусками задачи.
         """
         self.interval_hours = interval_hours

@@ -16,6 +16,8 @@ async def get_objects_keyboard(page: int = 0, OBJECTS_PER_PAGE: int = 9, list_fu
 
     if not list_futures:
         return InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="🔙 Меню", callback_data="go_menu_user")]])
+    
+    list_futures = list(set(list_futures))
 
     total_items = len(list_futures)
     total_pages = math.ceil(total_items / OBJECTS_PER_PAGE)
