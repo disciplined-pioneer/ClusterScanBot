@@ -1,8 +1,8 @@
 import os
-import numpy as np
+import pandas as pd
 import seaborn as sns
+import mplfinance as mpf
 import matplotlib.pyplot as plt
-from mplfinance.original_flavor import candlestick_ohlc
 
 
 class FuturesVisualizer:
@@ -28,19 +28,24 @@ class FuturesVisualizer:
         cum_delta = data["delta"].cumsum()
         anomaly = data[data["is_anomaly"]]
 
+        if not isinstance(data.index, pd.DatetimeIndex):
+            data = data.copy()
+            data.index = pd.to_datetime(data.index)
+
         sns.set(style="darkgrid")
         fig, ax = plt.subplots(
             2, 1, gridspec_kw={"height_ratios": [3, 1]}, figsize=(15, 10), dpi=200
         )
 
-        # --- свечи ---
-        candlestick_ohlc(
-            ax[0],
-            zip(np.arange(len(data)), data['open'], data['high'], data['low'], data['close']),
-            width=0.6, colorup='g', colordown='r', alpha=0.5
+        mpf.plot(
+            data,
+            type='ohlc',
+            ax=ax[0],
+            style='classic',
+            volume=False
         )
 
-        # === ДОБАВЛЕН ОБЪЁМ ПОД СВЕЧАМИ ===
+        # === ДОБАВЛЕН ОБЪЁМ ПОД БАРЫ ===
         ax_vol = ax[0].twinx()
         ax_vol.bar(
             data.index,
@@ -73,28 +78,35 @@ class FuturesVisualizer:
         return self._save_plot(fig, futures_name, time_frame, number)
 
     def visualize_anomalies_senior(self, data, vap_levels: list, futures_name: str, time_frame: str, number: int=1):
-        """График с аномалиями + вертикальный объём"""
+        """График с аномалиями"""
         anomaly = data[data["is_anomaly"]]
 
-        sns.set(style="darkgrid")
-        fig, ax = plt.subplots(
-            2, 1, gridspec_kw={"height_ratios": [3, 1]}, figsize=(15, 10), dpi=200
-        )
+        # гарантируем правильный индекс
+        if not isinstance(data.index, pd.DatetimeIndex):
+            data = data.copy()
+            data.index = pd.to_datetime(data.index)
 
-        # Основной график — свечи
-        candlestick_ohlc(
-            ax[0],
-            zip(np.arange(len(data)), data['open'], data['high'], data['low'], data['close']),
-            width=0.6, colorup='g', colordown='r', alpha=0.5
+        sns.set(style="darkgrid")
+
+        # ОДИН AX
+        fig, ax = plt.subplots(figsize=(15, 8), dpi=200)
+
+        # OHLC бары
+        mpf.plot(
+            data,
+            type='ohlc',
+            ax=ax,
+            style='classic',
+            volume=False
         )
 
         # Уровни
         for levels, color in vap_levels:
             for level in levels.values():
-                ax[0].axhline(level, color=color, linestyle="-", linewidth=1)
+                ax.axhline(level, color=color, linestyle="-", linewidth=1)
 
         # Аномалии
-        ax[0].plot(
+        ax.plot(
             anomaly.index,
             anomaly["close"],
             "bs",
@@ -103,19 +115,9 @@ class FuturesVisualizer:
             label="Аномалия - кластер"
         )
 
-        # === ВЕРТИКАЛЬНЫЙ ОБЪЁМ ===
-        ax[1].bar(
-            data.index,
-            data["volume"],
-            color="#000000", 
-            alpha=0.35,
-            width=0.8,
-            align='center'
-        )
-
-        # Титл и легенда
-        ax[0].set_title(f"Ценовые данные с аномалиями. График: {futures_name}, ТФ: {time_frame}")
-        ax[0].legend()
+        # Заголовок / Легенда
+        ax.set_title(f"Ценовые данные с аномалиями. График: {futures_name}, ТФ: {time_frame}")
+        ax.legend()
 
         plt.tight_layout()
         return self._save_plot(fig, futures_name, time_frame, number)
