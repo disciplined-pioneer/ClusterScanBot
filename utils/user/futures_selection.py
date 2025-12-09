@@ -89,7 +89,7 @@ async def futures_analysis(callback: types.CallbackQuery, list_timeframes: list,
     combined_data = {}
     if senior_tfs:
         senior_combined_data = await fetcher.download_price(
-            futures_name, senior_tfs, limit=1500, save=True
+            futures_name, senior_tfs, limit=1000, save=True
         )
         combined_data.update(senior_combined_data)
 

@@ -7,7 +7,7 @@ from sklearn.preprocessing import StandardScaler
 
 class AnomalyDetector:
 
-    def __init__(self, contamination: float = 0.2, random_state: int = 42, scale_by: str = 'row'):
+    def __init__(self, contamination: float = 0.15, random_state: int = 42, scale_by: str = 'row'):
         """
         :param contamination: доля аномалий в данных
         :param random_state: seed
