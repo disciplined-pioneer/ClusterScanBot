@@ -35,7 +35,7 @@ class TaskScheduler:
         # Анализ с помощью изоляционного леса
         # scale_by='row' → стандартизация по строкам (по каждому фьючерсу)
         df_vol = volumes_table(combined_data, tf="15m", bars=288)
-        detector = AnomalyDetector(contamination=0.1, scale_by='row')
+        detector = AnomalyDetector(contamination=0.04, scale_by='row')
         result = detector.run(df_vol, columns="ALL", direction='up')
 
         # Изменяем в базе список фьючерсов
