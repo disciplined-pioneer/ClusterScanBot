@@ -74,6 +74,11 @@ class FuturesVisualizer:
         # кумулятивная дельта
         ax[1].plot(data.index, cum_delta, color="#696969")
 
+        # Чистка
+        ax.set_xlabel('')
+        ax.set_ylabel('')
+        ax.set_xticks([])
+
         plt.tight_layout()
         return self._save_plot(fig, futures_name, time_frame, number)
 
@@ -114,6 +119,11 @@ class FuturesVisualizer:
             markersize=8,
             label="Аномалия - кластер"
         )
+
+        # Чистка
+        ax.set_xlabel('')
+        ax.set_ylabel('')
+        ax.set_xticks([])
 
         # Заголовок / Легенда
         ax.set_title(f"Ценовые данные с аномалиями. График: {futures_name}, ТФ: {time_frame}")
