@@ -75,9 +75,9 @@ class FuturesVisualizer:
         ax[1].plot(data.index, cum_delta, color="#696969")
 
         # Чистка
-        ax.set_xlabel('')
-        ax.set_ylabel('')
-        ax.set_xticks([])
+        ax[0].set_xlabel('')
+        ax[0].set_ylabel('')
+        ax[0].set_xticks([])
 
         plt.tight_layout()
         return self._save_plot(fig, futures_name, time_frame, number)
